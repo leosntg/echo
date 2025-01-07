@@ -1,9 +1,9 @@
 # Echo
 ## Testes
-### Criar postagem
+### Criar postagem (public/postagens-create.html)
 ![image](https://github.com/user-attachments/assets/dea7d41e-6bfc-4169-9062-ff34d8cc64be)
 
-### Listar postagens
+### Listar postagens (public/postagens-list.html)
 ![image](https://github.com/user-attachments/assets/c859abe2-8b3f-4653-83c0-45d40d026a79)
 
 ## Páginas
