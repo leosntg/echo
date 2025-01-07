@@ -1,0 +1,59 @@
+<section class="py-5">
+    <div class="container">
+        <div class="justify-content-center row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-none mb-3" id="message"></div>
+                        <form>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">E-mail</label>
+                                <input type="email" name="email" id="email" class="form-control" placeholder="E-mail" autofocus required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="senha" class="form-label">Senha</label>
+                                <input type="password" name="senha" id="senha" class="form-control" placeholder="Senha" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<% script = `
+<script>
+    document.querySelector('form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+
+        try {
+            const response = await fetch('/api/usuarios/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, senha })
+            });
+
+            const messageDiv = document.getElementById('message');
+
+            if (response.ok) {
+                window.location.href = '/';
+            } else {
+                const error = await response.text();
+                messageDiv.innerHTML = '<div class="alert alert-danger">' + error + '</div>';
+                messageDiv.classList.remove('d-none');
+            }
+        } catch (error) {
+            console.error(error);
+            document.getElementById('message').innerHTML = '<div class="alert alert-danger">Erro ao enviar os dados. Tente novamente.</div>';
+            messageDiv.classList.remove('d-none');
+        }
+    });
+</script>
+`; %>

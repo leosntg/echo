@@ -1,0 +1,58 @@
+<section class="py-5">
+    <div class="container">
+        <div class="gy-3 row"></div>
+    </div>
+</section>
+
+<% script = `
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const response = await fetch('/api/postagens');
+            const postagens = await response.json();
+
+            const container = document.querySelector('.container .row');
+            container.innerHTML = '';
+
+            postagens.forEach(postagem => {
+                const postagemHtml = \`
+                    <div class="col-lg-6 offset-lg-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="align-items-center d-flex mb-3">
+                                    <div class="flex-shrink-0">
+                                        <img src="https://via.placeholder.com/80" alt="" class="rounded-circle">
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h3 class="h5"><a href="/perfil?userId=\${postagem.userId}">\${postagem.autor}</a></h3>
+                                        <p class="mb-0 text-secondary">Postado em \${new Date(postagem.data_criacao).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                                <p class="card-text">\${postagem.conteudo}</p>
+                            </div>
+                            <div class="card-footer">
+                                <ul class="nav nav-fill">
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <i class="bi bi-hand-thumbs-up me-1"></i>
+                                            Curtir
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <i class="bi bi-chat me-1"></i>
+                                            Comentar
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>\`;
+                container.innerHTML += postagemHtml;
+            });
+        } catch (error) {
+            console.error('Erro ao carregar postagens:', error);
+        }
+    });
+</script>
+`; %>

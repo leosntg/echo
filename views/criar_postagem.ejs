@@ -1,0 +1,54 @@
+<section class="py-5">
+    <div class="container">
+        <div class="justify-content-center row">
+            <div class="col-lg-6">
+                <div class="d-none mb-3" id="message"></div>
+                <form>
+                    <div class="mb-3">
+                        <textarea name="conteudo" id="" cols="30" rows="5" class="form-control" placeholder="O que você está pensando?"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Publicar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<% script = `
+<script>
+    document.querySelector('form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const conteudo = document.querySelector('textarea[name="conteudo"]').value.trim();
+        const messageDiv = document.getElementById('message');
+
+        if (!conteudo) {
+            messageDiv.innerHTML = '<div class="alert alert-danger">O conteúdo da postagem não pode estar vazio.</div>';
+            messageDiv.classList.remove('d-none');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/postagens', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ conteudo })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                messageDiv.innerHTML = '<div class="alert alert-success">Postagem criada com sucesso!</div>';
+                messageDiv.classList.remove('d-none');
+            } else {
+                const errorData = await response.json();
+                messageDiv.innerHTML = '<div class="alert alert-danger">Erro ao criar postagem.</div>';
+                messageDiv.classList.remove('d-none');
+            }
+        } catch (error) {
+            console.error('Erro ao criar postagem:', error);
+        }
+    });
+</script>
+`; %>

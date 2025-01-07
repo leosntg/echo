@@ -1,0 +1,111 @@
+<section class="py-5">
+    <div class="container">
+        <div class="gy-3 justify-content-center row">
+            <div class="col-lg-3">
+                <div class="card text-center">
+                    <div class="card-body"></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="align-items-center d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <img src="https://via.placeholder.com/80" alt="" class="rounded-circle">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h3 class="h5">Nome</h3>
+                                <p class="mb-0 text-secondary">Postado em 03/01/2025</p>
+                            </div>
+                        </div>
+                        <p class="card-text">Postagem</p>
+                    </div>
+                    <div class="card-footer">
+                        <ul class="nav nav-fill">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="bi bi-hand-thumbs-up me-1"></i>
+                                    Curtir
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="bi bi-chat me-1"></i>
+                                    Comentar
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<% script = `
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('userId');
+
+        if (!userId) {
+            alert('ID do usuário não fornecido.');
+            window.history.go(-1);
+            return;
+        }
+
+        try {
+            const response = await fetch(\`/api/usuarios/\${userId}\`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                const userCard = document.querySelector('.col-lg-3 .card-body');
+                userCard.innerHTML = \`
+                    <img src="https://via.placeholder.com/80" alt="" class="mb-3 rounded-circle">
+                    <h3 class="h5">\${data.usuario.nome}</h3>
+                    <p class="card-text">Email: \${data.usuario.email}</p>
+                    <p class="card-text">Conta criada em: \${data.usuario.dataCriacao}</p>
+                \`;
+
+                const postsContainer = document.querySelector('.col-lg-6');
+                if (data.postagens.length === 0) {
+                    postsContainer.innerHTML = '<p class="text-center">Nenhuma postagem encontrada.</p>';
+                } else {
+                    postsContainer.innerHTML = data.postagens
+                        .map(
+                            (post) => \`
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="align-items-center d-flex mb-3">
+                                        <div class="flex-shrink-0">
+                                            <img src="https://via.placeholder.com/80" alt="" class="rounded-circle">
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h3 class="h5">\${data.usuario.nome}</h3>
+                                            <p class="mb-0 text-secondary">Postado em \${post.dataCriacao}</p>
+                                        </div>
+                                    </div>
+                                    <p class="card-text">\${post.conteudo}</p>
+                                </div>
+                            </div>
+                        \`
+                        )
+                        .join('');
+                }
+            } else {
+                console.error('Erro ao carregar o perfil.');
+                window.history.go(-1);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar o perfil:', error);
+            window.history.go(-1);
+        }
+    });
+</script>
+`; %>
