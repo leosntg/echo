@@ -4,7 +4,7 @@
 ![image](https://github.com/user-attachments/assets/dea7d41e-6bfc-4169-9062-ff34d8cc64be)
 
 ### Criar postagem otimizado (public/postagens-create-2.html)
-![image](https://github.com/user-attachments/assets/53b65739-2158-40e0-aa3d-64053db99627)
+![image](https://github.com/user-attachments/assets/a5d31fce-bd3a-4a0e-9ad1-7abecf40ee2c)
 
 ### Listar postagens (public/postagens-list.html)
 ![image](https://github.com/user-attachments/assets/c859abe2-8b3f-4653-83c0-45d40d026a79)
