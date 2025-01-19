@@ -5,6 +5,7 @@ const db = require('../config/dbMySQL');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
+    console.log(req.user);
     const { conteudo } = req.body;
     const { id: idAutor } = req.user;
 
