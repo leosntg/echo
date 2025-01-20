@@ -12,14 +12,15 @@ router.post('/cadastrar', async (req, res) => {
 
     try {
         const result = await session.run(
-        `CREATE (u:Usuario {nome: $nome, email: $email, senha: $senha, tipo: 2, data_criacao: $data}) RETURN u`,
+        `CREATE (u:Usuario {nome: $nome, email: $email, senha: $senha, tipo: 2, data_criacao: $data}) RETURN u, id(u) AS userId`,
         { nome, email, senha: hashedSenha, data: new Date().toISOString().split('T')[0] }
         );
 
         const createdUser = result.records[0].get('u').properties;
+        const userId = result.records[0].get('userId').low;
 
         const token = jwt.sign(
-        { email: createdUser.email, nome: createdUser.nome },
+        { id: userId, email: createdUser.email, nome: createdUser.nome },
         process.env.JWT_SECRET,
         { expiresIn: '1h' }
         );
@@ -97,7 +98,7 @@ router.get('/:userId', async (req, res) => {
         };
 
         const [posts] = await db.query(
-            'SELECT conteudo, DATE_FORMAT(data_criacao, "%d/%m/%Y") AS dataCriacao FROM Postagem WHERE id_autor = ? ORDER BY data_criacao DESC',
+            'SELECT conteudo, DATE_FORMAT(data_criacao, "%d/%m/%Y") AS dataCriacao FROM Postagem WHERE id_autor = ? ORDER BY id DESC',
             [userId]
         );
 

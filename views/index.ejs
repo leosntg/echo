@@ -14,6 +14,10 @@
             const container = document.querySelector('.container .row');
             container.innerHTML = '';
 
+            if (!postagens.length) {
+                container.innerHTML = "<div class='col-lg-12'>Nenhuma postagem encontrada.</div>";
+            }
+
             postagens.forEach(postagem => {
                 const postagemHtml = \`
                     <div class="col-lg-6 offset-lg-3">
@@ -33,13 +37,13 @@
                             <div class="card-footer">
                                 <ul class="nav nav-fill">
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
+                                        <a href="#" class="nav-link like-post" data-post-id="\${postagem.id}">
                                             <i class="bi bi-hand-thumbs-up me-1"></i>
-                                            Curtir
+                                            Curtir (<span class="like-count">\${postagem.curtidas || 0}</span>)
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
+                                        <a href="#" class="nav-link toggle-comments" data-post-id="\${postagem.id}">
                                             <i class="bi bi-chat me-1"></i>
                                             Comentar
                                         </a>
@@ -47,8 +51,126 @@
                                 </ul>
                             </div>
                         </div>
+                        <div class="comments-section d-none" data-post-id="\${postagem.id}">
+                            <div class="card mt-3">
+                                <h3 class="card-header h5">Comentários</h3>
+                                <div class="card-body">
+                                    <ul class="list-group mb-3 comments-list">
+                                    </ul>
+                                    <form class="comment-form">
+                                        <div class="mb-3">
+                                            <textarea cols="30" rows="5" class="form-control" placeholder="O que você está pensando?"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Enviar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>\`;
                 container.innerHTML += postagemHtml;
+            });
+
+            document.querySelectorAll('.like-post').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const postId = button.getAttribute('data-post-id');
+                    try {
+                        const response = await fetch(\`/api/curtidas/postagem/\${postId}\`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        });
+
+                        if (response.status === 201) {
+                            const likeCountElement = button.querySelector('.like-count');
+                            likeCountElement.textContent = parseInt(likeCountElement.textContent) + 1;
+                        }
+                    } catch (error) {
+                        console.error('Erro ao curtir postagem:', error);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.toggle-comments').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const postId = button.getAttribute('data-post-id');
+                    const commentsSection = document.querySelector(\`.comments-section[data-post-id="\${postId}"]\`);
+
+                    if (commentsSection.classList.contains('d-none')) {
+                        try {
+                            const response = await fetch(\`/api/comentarios/\${postId}\`);
+                            const comentarios = await response.json();
+                            const commentsList = commentsSection.querySelector('.comments-list');
+                            commentsList.innerHTML = '';
+
+                            comentarios.forEach(comentario => {
+                                const commentHtml = \`
+                                    <li class="list-group-item">
+                                        <div class="align-items-center d-flex mb-3">
+                                            <div class="flex-shrink-0">
+                                                <img src="https://via.placeholder.com/80" alt="" class="rounded-circle">
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h3 class="h5"><a href="/perfil?userId=\${comentario.id_autor}">\${comentario.autor}</a></h3>
+                                                <p class="mb-0 text-secondary">Postado em \${new Date(comentario.data_criacao).toLocaleDateString()}</p>
+                                            </div>
+                                        </div>
+                                        <p class="card-text">\${comentario.conteudo}</p>
+                                    </li>\`;
+                                commentsList.innerHTML += commentHtml;
+                            });
+
+                            commentsSection.classList.remove('d-none');
+                        } catch (error) {
+                            console.error('Erro ao carregar comentários:', error);
+                        }
+                    } else {
+                        commentsSection.classList.add('d-none');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.comment-form').forEach(form => {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const textarea = form.querySelector('textarea');
+                    const conteudo = textarea.value.trim();
+                    if (!conteudo) return;
+
+                    const postId = form.closest('.comments-section').getAttribute('data-post-id');
+
+                    try {
+                        const response = await fetch(\`/api/comentarios/\${postId}\`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ conteudo }),
+                        });
+                        const novoComentario = await response.json();
+
+                        const commentHtml = \`
+                            <li class="list-group-item">
+                                <div class="align-items-center d-flex mb-3">
+                                    <div class="flex-shrink-0">
+                                        <img src="https://via.placeholder.com/80" alt="" class="rounded-circle">
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h3 class="h5"><a href="/perfil?userId=\${novoComentario.autor.id}">\${novoComentario.autor.nome}</a></h3>
+                                        <p class="mb-0 text-secondary">Postado em \${new Date(novoComentario.data_criacao).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                                <p class="card-text">\${novoComentario.conteudo}</p>
+                            </li>\`;
+                        form.closest('.comments-section').querySelector('.comments-list').innerHTML += commentHtml;
+
+                        textarea.value = '';
+                    } catch (error) {
+                        console.error('Erro ao enviar comentário:', error);
+                    }
+                });
             });
         } catch (error) {
             console.error('Erro ao carregar postagens:', error);
