@@ -110,20 +110,6 @@ main {
     background-color: #005f8e;
 }
 
-footer {
-    background-color: #0077b6;
-    color: #fff;
-    text-align: center;
-    padding: 1rem 0;
-    margin-top: 2rem;
-    font-size: 0.875rem;
-    bottom: 0;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-}
-
 .custom-font {
     font-family: "Zen Dots", serif;
     font-weight: 400;
